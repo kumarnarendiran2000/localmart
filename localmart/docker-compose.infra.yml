@@ -1,0 +1,47 @@
+services:
+
+  # ─────────────────────────────────────────────
+  # PostgreSQL — relational database
+  # Used by: user-service, order-service, payment-service
+  # ─────────────────────────────────────────────
+  postgres:
+    image: postgres:16
+    container_name: localmart-postgres
+    environment:
+      POSTGRES_USER: localmart
+      POSTGRES_PASSWORD: localmart123
+      POSTGRES_DB: localmart
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U localmart"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────────
+  # MongoDB — document database
+  # Used by: shop-service, notification-service
+  # ─────────────────────────────────────────────
+  mongodb:
+    image: mongo:7
+    container_name: localmart-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: localmart
+      MONGO_INITDB_ROOT_PASSWORD: localmart123
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# Named volumes — Docker manages the data on your machine
+volumes:
+  postgres-data:
+  mongodb-data:

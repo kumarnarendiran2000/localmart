@@ -1,0 +1,11 @@
+meta {
+  name: Delete Shop - soft delete (Amma Store)
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{base_url}}/api/shops/{{ammaShopId}}
+  body: none
+  auth: none
+}

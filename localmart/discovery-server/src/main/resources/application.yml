@@ -1,0 +1,38 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: discovery-server   # This name appears in logs and Eureka dashboard
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    # Eureka server must NOT register itself with itself —
+    # it IS the registry, it doesn't need to be IN the registry
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+  server:
+    # Self-preservation mode: Eureka normally holds onto registrations even
+    # if heartbeats stop (assumes network partition, not crash).
+    # In local dev we turn it OFF so dead services are removed immediately.
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 5000   # check for dead instances every 5s (dev only)
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    '[com.localmart]': DEBUG
+    com.netflix.eureka: WARN        # suppress Eureka's own verbose internal logs
+    com.netflix.discovery: WARN

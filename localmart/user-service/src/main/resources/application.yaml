@@ -1,0 +1,73 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: user-service   # Eureka registers this service under this name
+                         # API Gateway routes lb://user-service to this
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/localmart_users
+    # url breakdown:
+    #   jdbc:postgresql  → protocol: tells JDBC to use PostgreSQL driver
+    #   localhost:5432   → host:port (our Docker PostgreSQL container)
+    #   localmart_users  → the database name
+    username: localmart
+    password: localmart123
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+      # validate: on startup, Hibernate checks that @Entity fields match
+      # the existing DB columns. If they don't match, startup fails with a clear error.
+      # It does NOT create or alter tables — Flyway owns the schema entirely.
+      # Other values (for reference):
+      #   create-drop → drops + recreates tables on every restart (dev only, DANGEROUS)
+      #   update      → auto-alters tables (DANGEROUS in production, may drop columns)
+      #   none        → do nothing (use if you don't want even validation)
+    show-sql: false       # set to true temporarily if you want to see generated SQL
+    open-in-view: false
+    # open-in-view: false — disables the OSIV anti-pattern.
+    # If true (Spring Boot default), the JPA session stays open through the HTTP response
+    # which can cause lazy-loading outside transactions and unexpected DB queries.
+    # Always set false in production.
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+          # Forces Hibernate to use UTC for all JDBC timestamp operations.
+          # Without this, Hibernate picks up the JVM system timezone ("Asia/Calcutta")
+          # and sends it to PostgreSQL — but PostgreSQL 16 only accepts the modern
+          # IANA name "Asia/Kolkata", not the deprecated "Asia/Calcutta".
+          # UTC also the production best practice: always store timestamps in UTC.
+
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    # locations: where Flyway looks for SQL migration files.
+    # classpath:db/migration → src/main/resources/db/migration/
+    # Files named V1__description.sql, V2__description.sql etc. run in order.
+
+# Eureka client — register this service so the gateway can find it
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# Actuator — health check endpoint
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    '[com.localmart]': DEBUG

@@ -1,0 +1,11 @@
+meta {
+  name: Get Orders by Shop
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{order_base_url}}/api/orders?shopId={{muruganShopId}}
+  body: none
+  auth: none
+}

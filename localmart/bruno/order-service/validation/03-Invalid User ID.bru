@@ -1,0 +1,20 @@
+meta {
+  name: Validation - Invalid User ID (non-existent)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{order_base_url}}/api/orders
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "userId": "00000000-0000-0000-0000-000000000000",
+    "shopId": "{{muruganShopId}}",
+    "productId": "{{lastProductId}}",
+    "quantity": 1
+  }
+}

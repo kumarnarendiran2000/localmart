@@ -1,0 +1,19 @@
+meta {
+  name: Update User - Ravi
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{user_base_url}}/api/users/{{lastUserId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Ravi Kumar",
+    "phone": "9876543210",
+    "address": "18, Velachery Main Road, Chennai"
+  }
+}

@@ -1,0 +1,11 @@
+meta {
+  name: Delete User - soft delete
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{user_base_url}}/api/users/{{lastUserId}}
+  body: none
+  auth: none
+}

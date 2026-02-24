@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+        This is the PARENT POM — it does not run itself.
+        It has <packaging>pom</packaging> which means Maven treats it
+        as a container that manages child modules, not a deployable artifact.
+
+        Inheritance chain:
+          Each child service pom.xml
+              → this localmart-parent
+                  → spring-boot-starter-parent (from Maven Central)
+
+        Benefits:
+        - One place to pin versions (Spring Boot, Spring Cloud, Java)
+        - Shared dependencies flow to all children automatically
+        - `mvn clean install` at this level builds ALL services in order
+    -->
+
+    <!-- This parent gives us Spring Boot's plugin config + managed versions -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.0.3</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.localmart</groupId>
+    <artifactId>localmart-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>LocalMart Parent</name>
+    <description>LocalMart - Local Shop Marketplace Microservices</description>
+
+    <!-- All Java service modules declared here -->
+    <!-- .NET services (payment, notification) are separate — they don't use Maven -->
+    <modules>
+        <module>discovery-server</module>
+        <module>api-gateway</module>
+        <module>shop-service</module>
+        <module>user-service</module>
+        <module>order-service</module>
+    </modules>
+
+    <properties>
+        <java.version>21</java.version>
+        <!-- Spring Cloud version compatible with Spring Boot 4.0.3 -->
+        <spring-cloud.version>2025.1.0</spring-cloud.version>
+    </properties>
+
+    <!--
+        dependencyManagement: pins versions ONLY — does NOT add dependencies.
+        Child modules still need to declare the dependency, but WITHOUT a <version> tag.
+        This prevents version conflicts across services.
+    -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Cloud BOM — covers Eureka, Gateway, OpenFeign, Resilience4j etc. -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- SpringDoc OpenAPI: version pinned here centrally.
+                 Only business API services (shop, user, order) opt-in by declaring
+                 this in their own pom WITHOUT a version tag.
+                 discovery-server and api-gateway do NOT declare it. -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>3.0.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!--
+        Shared dependencies — automatically inherited by ALL child modules.
+        Only add things that genuinely apply to every single service.
+    -->
+    <dependencies>
+
+        <!-- Actuator: exposes /actuator/health, /actuator/info endpoints on every service -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!--
+            Lombok: compile-time annotation processor.
+            Generates getters, setters, constructors, builders at compile time.
+            optional=true means it doesn't leak into downstream dependencies.
+            We will use @Data, @Builder, @Slf4j etc. in every service.
+        -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Test: JUnit 5 + Mockito + Spring test support for every service -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Monitoring deps (Zipkin tracing, Prometheus metrics) — coming soon -->
+
+
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- Exclude Lombok from the packaged JAR — it's compile-time only -->
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

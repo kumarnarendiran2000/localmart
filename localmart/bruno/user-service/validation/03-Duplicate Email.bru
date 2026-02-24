@@ -1,0 +1,21 @@
+meta {
+  name: Validation - Duplicate Email
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{user_base_url}}/api/users
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Another Ravi",
+    "email": "ravi.kumar@gmail.com",
+    "phone": "7654321098",
+    "address": "Madurai",
+    "role": "CUSTOMER"
+  }
+}

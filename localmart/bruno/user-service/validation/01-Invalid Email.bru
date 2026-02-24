@@ -1,0 +1,21 @@
+meta {
+  name: Validation - Invalid Email
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{user_base_url}}/api/users
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Test User",
+    "email": "not-an-email",
+    "phone": "9876543210",
+    "address": "Chennai",
+    "role": "CUSTOMER"
+  }
+}

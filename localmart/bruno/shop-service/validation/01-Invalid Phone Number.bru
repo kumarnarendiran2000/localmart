@@ -1,0 +1,20 @@
+meta {
+  name: Validation - Invalid Phone (expect 400)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/shops
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Test Shop",
+    "ownerName": "Test Owner",
+    "location": "Chennai",
+    "phone": "1234567890"
+  }
+}

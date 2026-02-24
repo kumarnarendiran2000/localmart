@@ -1,0 +1,20 @@
+meta {
+  name: Add Filter Coffee to Murugan Stores
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/shops/{{muruganShopId}}/products
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Filter Coffee Powder",
+    "price": 320.00,
+    "unit": "kg",
+    "stockQuantity": 50
+  }
+}

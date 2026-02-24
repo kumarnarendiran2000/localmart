@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+        Child pom — inherits from localmart-parent.
+        We get for FREE: actuator, lombok, spring-boot-starter-test,
+        micrometer, spring-boot-maven-plugin, Java 21, Spring Cloud BOM.
+
+        We only declare what is SPECIFIC to shop-service.
+    -->
+    <parent>
+        <groupId>com.localmart</groupId>
+        <artifactId>localmart-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>shop-service</artifactId>
+    <name>LocalMart Shop Service</name>
+
+    <dependencies>
+
+        <!--
+            Spring Web MVC: enables @RestController, @GetMapping etc.
+            Includes embedded Tomcat server.
+            Note: Spring Boot 4.x renamed spring-boot-starter-web → spring-boot-starter-webmvc
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
+        </dependency>
+
+        <!-- Spring Data MongoDB: enables @Document, MongoRepository, auto-connects to MongoDB -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+
+        <!-- Eureka Client: registers this service with Eureka on startup -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <!-- Bean Validation: enables @NotBlank, @NotNull, @Size, @Pattern, @Min, @Max etc.
+             Includes Hibernate Validator (the Jakarta Validation implementation).
+             NOT included in spring-boot-starter-webmvc — must be added explicitly. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- SpringDoc OpenAPI + Swagger UI.
+             Version managed by parent dependencyManagement — no version tag needed here.
+             Generates /v3/api-docs (JSON) and serves /swagger-ui.html automatically. -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
+
+    </dependencies>
+
+</project>

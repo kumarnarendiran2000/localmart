@@ -1,0 +1,20 @@
+meta {
+  name: Add Coconut Oil to Sri Lakshmi Stores
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_url}}/api/shops/{{sriLakshmiShopId}}/products
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Coconut Oil",
+    "price": 180.00,
+    "unit": "litre",
+    "stockQuantity": 75
+  }
+}

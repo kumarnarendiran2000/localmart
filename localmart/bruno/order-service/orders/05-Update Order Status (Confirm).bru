@@ -1,0 +1,17 @@
+meta {
+  name: Update Order Status - Confirm
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{order_base_url}}/api/orders/{{lastOrderId}}/status
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "CONFIRMED"
+  }
+}

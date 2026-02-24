@@ -1,0 +1,20 @@
+meta {
+  name: Validation - Invalid Quantity Zero
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{order_base_url}}/api/orders
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "userId": "{{lastUserId}}",
+    "shopId": "{{muruganShopId}}",
+    "productId": "{{lastProductId}}",
+    "quantity": 0
+  }
+}

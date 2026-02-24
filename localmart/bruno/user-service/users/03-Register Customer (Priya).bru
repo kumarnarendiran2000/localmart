@@ -1,0 +1,27 @@
+meta {
+  name: Register Customer - Priya
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{user_base_url}}/api/users
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Priya Lakshmi",
+    "email": "priya.lakshmi@gmail.com",
+    "phone": "8754321098",
+    "address": "5, RS Puram, Coimbatore",
+    "role": "CUSTOMER"
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setVar("lastUserId", res.body.id);
+  }
+}

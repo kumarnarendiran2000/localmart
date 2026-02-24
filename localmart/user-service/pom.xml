@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+    <!--
+        Parent points to our localmart-parent (NOT spring-boot-starter-parent directly).
+        localmart-parent itself extends spring-boot-starter-parent — so we still get all
+        Spring Boot version management, plugin config, and encoding settings from it.
+
+        relativePath tells Maven where to find the parent on disk without hitting Maven Central.
+        ../pom.xml = one level up from this module's folder.
+    -->
+    <parent>
+        <groupId>com.localmart</groupId>
+        <artifactId>localmart-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>user-service</artifactId>
+    <name>user-service</name>
+    <description>Manages customer and shop owner profiles for LocalMart</description>
+
+    <!--
+        groupId and version are inherited from parent — no need to redeclare.
+        Only artifactId, name, description are unique to this module.
+    -->
+
+    <dependencies>
+
+        <!-- REST API layer — same as shop-service -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
+        </dependency>
+
+        <!--
+            JPA + Hibernate — the bridge between Java @Entity classes and PostgreSQL.
+            JPA is the specification (interface); Hibernate is the implementation.
+            This starter auto-configures: DataSource, EntityManagerFactory, transactions.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!--
+            Flyway — database schema version control.
+            Reads SQL files from src/main/resources/db/migration/ at startup.
+            Runs only new migrations, tracks history in flyway_schema_history table.
+            We own the schema via SQL — Hibernate only validates it (ddl-auto=validate).
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-flyway</artifactId>
+        </dependency>
+
+        <!--
+            flyway-database-postgresql — required from Flyway 10+ onwards.
+            Flyway 10 split database-specific drivers into separate modules.
+            Without this, Flyway cannot connect to PostgreSQL even if the JDBC driver is present.
+        -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+        </dependency>
+
+        <!-- Bean Validation — @NotBlank, @Email, @Pattern, @Valid on request DTOs -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!--
+            PostgreSQL JDBC driver — runtime scope because:
+            - We don't import any PostgreSQL classes in our code directly
+            - JPA/Hibernate loads the driver at runtime via JDBC URL
+            - scope=runtime keeps it off the compile classpath (less noise)
+        -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Eureka client — registers user-service with discovery-server on startup -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <!--
+            SpringDoc — generates OpenAPI 3.x spec + serves Swagger UI.
+            Version is NOT declared here — managed centrally in localmart-parent's
+            dependencyManagement block (3.0.1). Child modules opt-in without a version.
+        -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
+
+        <!--
+            actuator, lombok, spring-boot-starter-test are declared in localmart-parent's
+            <dependencies> block — inherited automatically by all child modules.
+            No need to redeclare them here.
+        -->
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

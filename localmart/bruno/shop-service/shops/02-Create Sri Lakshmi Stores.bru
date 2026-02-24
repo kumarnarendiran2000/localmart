@@ -1,0 +1,26 @@
+meta {
+  name: Create Sri Lakshmi General Stores
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/shops
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Sri Lakshmi General Stores",
+    "ownerName": "Lakshmi Devi",
+    "location": "Coimbatore",
+    "phone": "8765432109"
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setVar("sriLakshmiShopId", res.body.id);
+  }
+}

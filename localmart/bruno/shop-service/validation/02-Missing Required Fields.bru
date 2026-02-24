@@ -1,0 +1,19 @@
+meta {
+  name: Validation - Missing Name (expect 400)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/shops
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "ownerName": "Test Owner",
+    "location": "Chennai",
+    "phone": "9876543210"
+  }
+}

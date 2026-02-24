@@ -1,0 +1,44 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: shop-service   # Eureka registers this service under this name
+                         # API Gateway routes lb://shop-service to this
+
+  mongodb:
+    uri: mongodb://localmart:localmart123@localhost:27017/localmart-shops?authSource=admin
+    # uri breakdown:
+    #   localmart:localmart123  → username:password (set in docker-compose)
+    #   localhost:27017         → MongoDB host:port
+    #   localmart-shops         → database name (created automatically on first write)
+    #   authSource=admin        → where the user credentials are stored
+
+  data:
+    mongodb:
+      auto-index-creation: true
+      # Tells Spring Data MongoDB to read @Indexed and @CompoundIndex annotations
+      # on model classes at startup and create those indexes in MongoDB automatically.
+      # Default is false in Spring Data MongoDB 4.x — must be explicitly enabled.
+    
+    # Eureka client — register this service so the gateway can find it
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# Actuator — health check endpoint
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    '[com.localmart]': DEBUG

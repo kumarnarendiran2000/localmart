@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:spring.io)",
+      "WebFetch(domain:kafka.apache.org)"
+    ]
+  }
+}

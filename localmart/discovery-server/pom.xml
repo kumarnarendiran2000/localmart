@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+        Child pom — inherits from localmart-parent.
+        What we get for FREE from the parent:
+          - Spring Boot 4.0.3 managed versions
+          - Spring Cloud 2025.1.0 BOM
+          - actuator, micrometer-tracing, prometheus, lombok (shared deps)
+          - spring-boot-maven-plugin config
+          - Java 21 compiler settings
+
+        We only declare what is SPECIFIC to this service.
+    -->
+    <parent>
+        <groupId>com.localmart</groupId>
+        <artifactId>localmart-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>discovery-server</artifactId>
+    <name>LocalMart Discovery Server</name>
+
+    <dependencies>
+        <!--
+            eureka-server: activates the Eureka registry in this process.
+            On startup, it exposes REST endpoints at /eureka/* that other
+            services POST to when registering themselves.
+            Combined with @EnableEurekaServer on the main class, this
+            service becomes the central registry for the whole system.
+        -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+        </dependency>
+
+        <!--
+            Web starter needed so the Eureka dashboard (HTML UI) and
+            the /eureka/* REST endpoints are served over HTTP.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

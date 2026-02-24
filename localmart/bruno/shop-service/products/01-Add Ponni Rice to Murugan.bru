@@ -1,0 +1,26 @@
+meta {
+  name: Add Ponni Rice to Murugan Stores
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/shops/{{muruganShopId}}/products
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Ponni Rice",
+    "price": 65.00,
+    "unit": "kg",
+    "stockQuantity": 200
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setVar("lastProductId", res.body.id);
+  }
+}

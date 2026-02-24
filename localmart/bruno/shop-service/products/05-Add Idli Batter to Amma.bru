@@ -1,0 +1,20 @@
+meta {
+  name: Add Idli Batter to Amma Store
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{base_url}}/api/shops/{{ammaShopId}}/products
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Idli Batter",
+    "price": 45.00,
+    "unit": "kg",
+    "stockQuantity": 30
+  }
+}

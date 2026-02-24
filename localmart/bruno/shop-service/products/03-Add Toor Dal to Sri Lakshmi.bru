@@ -1,0 +1,20 @@
+meta {
+  name: Add Toor Dal to Sri Lakshmi Stores
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/api/shops/{{sriLakshmiShopId}}/products
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Toor Dal",
+    "price": 120.00,
+    "unit": "kg",
+    "stockQuantity": 100
+  }
+}

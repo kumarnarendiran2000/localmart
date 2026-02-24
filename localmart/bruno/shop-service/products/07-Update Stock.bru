@@ -1,0 +1,17 @@
+meta {
+  name: Update Stock - Ponni Rice
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{base_url}}/api/shops/{{muruganShopId}}/products/{{lastProductId}}/stock
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "quantity": 150
+  }
+}

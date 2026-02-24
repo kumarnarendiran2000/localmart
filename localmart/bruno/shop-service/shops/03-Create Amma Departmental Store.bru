@@ -1,0 +1,26 @@
+meta {
+  name: Create Amma Departmental Store
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/api/shops
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Amma Departmental Store",
+    "ownerName": "Selvi Rajan",
+    "location": "Madurai",
+    "phone": "7654321098"
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setVar("ammaShopId", res.body.id);
+  }
+}

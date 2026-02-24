@@ -1,0 +1,21 @@
+meta {
+  name: Validation - Invalid Phone
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{user_base_url}}/api/users
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Test User",
+    "email": "test@gmail.com",
+    "phone": "12345",
+    "address": "Chennai",
+    "role": "CUSTOMER"
+  }
+}

@@ -1,0 +1,28 @@
+meta {
+  name: Register Shop Owner - Murugan
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{user_base_url}}/api/users
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Murugan Krishnan",
+    "email": "murugan.krishnan@gmail.com",
+    "phone": "9500012345",
+    "address": "12, T Nagar, Chennai",
+    "role": "SHOP_OWNER"
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setVar("lastUserId", res.body.id);
+    bru.setVar("muruganUserId", res.body.id);
+  }
+}
