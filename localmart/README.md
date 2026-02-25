@@ -7,7 +7,7 @@ Built with Java 21 + Spring Boot 4 + .NET 8.
 
 ## Architecture
 
-```
+```text
   CLIENT (Bruno / Postman)
         │
         ▼
@@ -29,15 +29,15 @@ MongoDB PostgreSQL  PostgreSQL
 
 ## Services
 
-| Service              | Port | Language     | Database   | Status       |
-|----------------------|------|--------------|------------|--------------|
-| discovery-server     | 8761 | Java/Spring  | —          | Live         |
-| api-gateway          | 8080 | Java/Spring  | —          | Live         |
-| shop-service         | 8081 | Java/Spring  | MongoDB    | Live         |
-| user-service         | 8082 | Java/Spring  | PostgreSQL | Live         |
-| order-service        | 8083 | Java/Spring  | PostgreSQL | Live         |
-| payment-service      | 8084 | .NET 8       | PostgreSQL | Coming soon  |
-| notification-service | 8085 | .NET 8       | MongoDB    | Coming soon  |
+| Service              | Port | Language    | Database   | Status      |
+|----------------------|------|-------------|------------|-------------|
+| discovery-server     | 8761 | Java/Spring | —          | Live        |
+| api-gateway          | 8080 | Java/Spring | —          | Live        |
+| shop-service         | 8081 | Java/Spring | MongoDB    | Live        |
+| user-service         | 8082 | Java/Spring | PostgreSQL | Live        |
+| order-service        | 8083 | Java/Spring | PostgreSQL | Live        |
+| payment-service      | 8084 | .NET 8      | PostgreSQL | Coming soon |
+| notification-service | 8085 | .NET 8      | MongoDB    | Coming soon |
 
 ---
 
@@ -46,7 +46,7 @@ MongoDB PostgreSQL  PostgreSQL
 - Java 21
 - Maven 3.9+
 - Docker Desktop (for databases)
-- Bruno (API client) — https://www.usebruno.com
+- Bruno (API client) — <https://www.usebruno.com>
 
 ---
 
@@ -91,13 +91,13 @@ mvn spring-boot:run -pl order-service
 
 ## Verify Everything Is Up
 
-| URL                                   | What you should see                    |
-|---------------------------------------|----------------------------------------|
-| http://localhost:8761                 | Eureka dashboard — all services listed |
-| http://localhost:8081/swagger-ui.html | Shop Service API docs                  |
-| http://localhost:8082/swagger-ui.html | User Service API docs                  |
-| http://localhost:8083/swagger-ui.html | Order Service API docs                 |
-| http://localhost:8081/actuator/health | `{"status":"UP"}`                      |
+| URL | What you should see |
+| --- | ------------------- |
+| <http://localhost:8761> | Eureka dashboard — all services listed |
+| <http://localhost:8081/swagger-ui.html> | Shop Service API docs |
+| <http://localhost:8082/swagger-ui.html> | User Service API docs |
+| <http://localhost:8083/swagger-ui.html> | Order Service API docs |
+| <http://localhost:8081/actuator/health> | `{"status":"UP"}` |
 
 ---
 
@@ -157,11 +157,11 @@ mvn spring-boot:run -pl order-service
 
 ## Databases
 
-| Database         | Used by                   | Credentials                           |
-|------------------|---------------------------|---------------------------------------|
-| shop-service     | shop-service (MongoDB)    | user: localmart / pass: localmart123  |
-| localmart_users  | user-service (PostgreSQL) | user: localmart / pass: localmart123  |
-| localmart_orders | order-service (PostgreSQL)| user: localmart / pass: localmart123  |
+| Database         | Used by                    | Credentials                          |
+|------------------|----------------------------|--------------------------------------|
+| shop-service     | shop-service (MongoDB)     | user: localmart / pass: localmart123 |
+| localmart_users  | user-service (PostgreSQL)  | user: localmart / pass: localmart123 |
+| localmart_orders | order-service (PostgreSQL) | user: localmart / pass: localmart123 |
 
 > Flyway manages schema migrations automatically on startup for PostgreSQL services.
 > Migration files live in `src/main/resources/db/migration/`.
@@ -191,23 +191,3 @@ mvn test -pl order-service
 Currently live: service discovery, API gateway, shop catalog, user profiles, order management with sync inter-service calls and circuit breaking.
 
 Coming soon: payment processing, email notifications, distributed tracing, metrics dashboards, authentication, full containerization, and cloud deployment.
-
----
-
-## FAQs
-
-**Q: Why does discovery-server need to start first?**
-All other services register with Eureka on startup. If Eureka isn't running, they log warnings and retry — but routes via the gateway won't resolve until registration succeeds.
-
-**Q: Why Spring Boot 4.x and not 3.x?**
-Spring Boot 4.x is the current stable release. It requires Java 17+ (we use 21). The web starter was renamed from `spring-boot-starter-web` to `spring-boot-starter-webmvc` in this version.
-
-**Q: What is `ddl-auto: validate`?**
-Hibernate checks that the database schema matches the entity definitions on every startup, but does not modify the schema. Flyway owns all schema changes via migration files.
-
-**Q: Can I call services directly without going through the gateway?**
-Yes — during development, direct calls to `localhost:8081`, `8082`, `8083` work fine. The gateway (`localhost:8080`) is the production entry point and will later enforce authentication.
-
-**Q: What does `process-aot` do? Should I run it?**
-AOT (Ahead of Time) is for building GraalVM native binaries — not used in this project's current setup. Never run `spring-boot:process-aot` during normal development. Use `spring-boot:run` or `clean install` only.
-v-i
