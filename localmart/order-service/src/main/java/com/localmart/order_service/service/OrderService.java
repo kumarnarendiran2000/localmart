@@ -10,6 +10,7 @@ import com.localmart.order_service.exception.ResourceNotFoundException;
 import com.localmart.order_service.exception.ServiceUnavailableException;
 import com.localmart.order_service.model.Order;
 import com.localmart.order_service.repository.OrderRepository;
+import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -109,31 +110,52 @@ public class OrderService {
     // --- Circuit-breaker-protected Feign calls ---
 
     /**
-     * Calls user-service to verify the user exists.
-     * If user-service is down or times out, Resilience4j calls the fallback.
+     * Verifies the user exists by calling user-service.
      *
-     * fallbackMethod name must match exactly — Resilience4j finds it by reflection.
-     * The fallback receives the same arguments plus the Throwable that triggered it.
+     * 4xx from user-service (e.g. 404 user not found) = business error, not an infrastructure failure.
+     * We convert it to ResourceNotFoundException, which Resilience4j is configured to IGNORE
+     * (see ignore-exceptions in application.yaml) — so it does NOT count toward circuit breaker failures.
+     *
+     * 5xx / timeout / connection refused = real infrastructure failure.
+     * These propagate as FeignException → Resilience4j counts them → eventually opens circuit → fallback runs.
      */
     @CircuitBreaker(name = "user-service", fallbackMethod = "userServiceFallback")
     private void verifyUser(UUID userId) {
-        userClient.getUser(userId);
-        // We only care that the call succeeded — the response fields aren't used here.
-        // If the user doesn't exist, Feign will throw a FeignException (404 from user-service)
-        // which also triggers the circuit breaker's failure count.
+        try {
+            userClient.getUser(userId);
+        } catch (FeignException e) {
+            if (e.status() >= 400 && e.status() < 500) {
+                // Downstream service is healthy — it returned a 4xx business error
+                throw new ResourceNotFoundException("User", userId);
+            }
+            throw e; // 5xx or connection error — let circuit breaker count it
+        }
     }
 
+    /**
+     * Fetches product details from shop-service.
+     * Same 4xx vs 5xx split as verifyUser above.
+     */
     @CircuitBreaker(name = "shop-service", fallbackMethod = "shopServiceFallback")
     private ProductInfo fetchProduct(String shopId, String productId) {
-        return shopClient.getProduct(shopId, productId);
+        try {
+            return shopClient.getProduct(shopId, productId);
+        } catch (FeignException e) {
+            if (e.status() >= 400 && e.status() < 500) {
+                throw new ResourceNotFoundException("Product", productId);
+            }
+            throw e;
+        }
     }
 
-    // Fallback methods — called by Resilience4j when the circuit is OPEN or call fails
+    // Fallback methods — called by Resilience4j only when circuit is OPEN or a 5xx/connection failure occurs
 
+    @SuppressWarnings("unused")
     private void userServiceFallback(UUID userId, Throwable t) {
         throw new ServiceUnavailableException("User service is currently unavailable. Please try again shortly.");
     }
 
+    @SuppressWarnings("unused")
     private ProductInfo shopServiceFallback(String shopId, String productId, Throwable t) {
         throw new ServiceUnavailableException("Shop service is currently unavailable. Please try again shortly.");
     }

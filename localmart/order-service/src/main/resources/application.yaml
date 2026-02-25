@@ -51,12 +51,19 @@ resilience4j:
         minimum-number-of-calls: 5
         wait-duration-in-open-state: 10000
         permitted-number-of-calls-in-half-open-state: 3
+        # 4xx errors (shop/product not found) are business errors, not infrastructure failures.
+        # Ignore them so they don't count toward circuit breaker failure rate.
+        ignore-exceptions:
+          - com.localmart.order_service.exception.ResourceNotFoundException
       user-service:
         sliding-window-size: 10
         failure-rate-threshold: 50
         minimum-number-of-calls: 5
         wait-duration-in-open-state: 10000
         permitted-number-of-calls-in-half-open-state: 3
+        # Same reason — 404 user not found is a valid business response, not a service failure.
+        ignore-exceptions:
+          - com.localmart.order_service.exception.ResourceNotFoundException
 
 eureka:
   client:
