@@ -9,23 +9,33 @@ Built with **Java 21 + Spring Boot 4 + Spring Cloud** (Java services) and **.NET
 
 ## How It Works
 
-```text
-  Client (Bruno / Postman / Browser)
-          │
-          ▼
-    API Gateway :8080          ← single entry point, routes to all services
-          │
-    ┌─────┼──────────────┐
-    ▼     ▼              ▼
- shop   user           order
- :8081  :8082          :8083
-MongoDB PostgreSQL   PostgreSQL
-                        │
-               verifies user  ──── user-service  (Feign + Circuit Breaker)
-               fetches product ─── shop-service   (Feign + Circuit Breaker)
+```mermaid
+graph TD
+    Client["Client\nBruno / Postman"]
+    Eureka["discovery-server\n:8761 · Eureka"]
+    GW["api-gateway\n:8080"]
+    SS["shop-service\n:8081 · MongoDB"]
+    US["user-service\n:8082 · PostgreSQL"]
+    OS["order-service\n:8083 · PostgreSQL"]
+    PS["payment-service\n:8084 · coming soon"]
+    NS["notification-service\n:8085 · coming soon"]
+
+    Client -->|HTTP| GW
+    GW -->|route| SS
+    GW -->|route| US
+    GW -->|route| OS
+    OS -->|Feign + Circuit Breaker| US
+    OS -->|Feign + Circuit Breaker| SS
+    OS -.->|Kafka · coming soon| PS
+    PS -.->|Kafka · coming soon| NS
+
+    Eureka -.-|register / discover| GW
+    Eureka -.-|register| SS
+    Eureka -.-|register| US
+    Eureka -.-|register| OS
 ```
 
-All services register with **Eureka** (port 8761). The API Gateway discovers them from Eureka and routes requests — no hardcoded service URLs.
+All services register with **Eureka** on startup. The API Gateway discovers them from Eureka and routes by service name — no hardcoded URLs anywhere.
 
 ---
 
@@ -45,14 +55,37 @@ All services register with **Eureka** (port 8761). The API Gateway discovers the
 
 ## Core Flow: Placing an Order
 
-When a customer places an order (`POST /api/orders`), here is what happens inside order-service:
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant GW as api-gateway
+    participant OS as order-service
+    participant US as user-service
+    participant SS as shop-service
+    participant DB as PostgreSQL
+
+    C->>GW: POST /api/orders
+    GW->>OS: route
+
+    OS->>US: GET /api/users/{userId}
+    US-->>OS: 200 user exists
+
+    OS->>SS: GET /api/shops/{shopId}/products/{productId}
+    SS-->>OS: 200 product + price
+
+    OS->>DB: INSERT order (price snapshot)
+    DB-->>OS: saved
+
+    OS-->>GW: 201 OrderResponse
+    GW-->>C: 201 OrderResponse
+```
 
 1. **Validate user** — Feign call to user-service → confirms the userId exists and is active
 2. **Fetch product** — Feign call to shop-service → gets current product details and price
-3. **Price snapshot** — `productName` and `unitPrice` are copied into the order record at the time of placement. Future price changes on the product do not affect existing orders.
+3. **Price snapshot** — `productName` and `unitPrice` are copied into the order at placement time. Future price changes do not affect existing orders.
 4. **Save order** — persisted in PostgreSQL with status `PENDING`
 
-If user-service or shop-service is **unreachable** (not a 404, but a connection failure), the circuit breaker opens after 5 consecutive failures. Subsequent calls fail immediately with HTTP 503 instead of waiting for the full connection timeout — protecting threads and giving the downstream service time to recover.
+If user-service or shop-service is **unreachable** (connection failure, not a 404), the circuit breaker opens after 5 consecutive failures. Subsequent calls fail instantly with HTTP 503 — no timeout wait, no thread blocking, and the downstream service gets time to recover.
 
 ---
 
