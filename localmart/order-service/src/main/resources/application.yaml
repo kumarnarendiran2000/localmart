@@ -76,7 +76,9 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info
+        # circuitbreakers  → current state (CLOSED / OPEN / HALF_OPEN) + counters
+        # circuitbreakerevents → recent call history (SUCCESS, ERROR, IGNORED_ERROR, NOT_PERMITTED, ...)
+        include: health, info, circuitbreakers, circuitbreakerevents
   endpoint:
     health:
       show-details: always
