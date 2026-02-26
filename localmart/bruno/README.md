@@ -145,12 +145,16 @@ Validation errors include an additional `errors` field:
 ## Demo: Circuit Breaker in Action
 
 1. Stop user-service (`Ctrl+C` in its terminal)
-2. Send `01-Place Order` from Bruno
-3. You get HTTP 503 with `"title": "Service Unavailable"`
-4. Restart user-service
-5. After a few seconds, the circuit closes — orders go through again
+2. Send `01-Place Order` 5 times — each returns HTTP 503 (`"title": "Service Unavailable"`)
+3. After the 5th failure the circuit opens — check state:
+   - `GET http://localhost:8083/actuator/circuitbreakers` → `"state": "OPEN"`, `"failureRate": "100.0%"`
+   - `GET http://localhost:8083/actuator/circuitbreakerevents/user-service` → 5 `ERROR` events + 1 `STATE_TRANSITION`
+4. Subsequent calls return 503 instantly (no timeout wait) — events show `NOT_PERMITTED`
+5. Wait 10 seconds → circuit moves to `HALF_OPEN` (visible in actuator)
+6. Start user-service back up, send the order request again
+7. Circuit closes → `GET /actuator/circuitbreakers` shows `"state": "CLOSED"`
 
-This demonstrates the OPEN → HALF_OPEN → CLOSED circuit breaker cycle.
+This demonstrates the full CLOSED → OPEN → HALF_OPEN → CLOSED recovery cycle.
 
 ---
 
