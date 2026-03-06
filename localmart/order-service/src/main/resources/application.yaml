@@ -43,6 +43,37 @@ spring:
 # wait-duration-in-open-state: how long circuit stays OPEN before trying again (ms)
 # permitted-number-of-calls-in-half-open-state: test calls allowed in HALF_OPEN
 resilience4j:
+
+  # ── Retry ────────────────────────────────────────────────────────────────────
+  # Fires BEFORE the circuit breaker counts a failure.
+  # max-attempts: total tries including the first (3 = 1 original + 2 retries)
+  # wait-duration: pause between attempts — gives the downstream a moment to recover
+  # retry-exceptions: ONLY retry on connection/timeout failures (transient infrastructure problems)
+  # ignore-exceptions: never retry on 4xx — same business error will come back regardless
+  retry:
+    instances:
+      shop-service:
+        max-attempts: 3
+        wait-duration: 500ms
+        retry-exceptions:
+          - feign.RetryableException
+        ignore-exceptions:
+          - com.localmart.order_service.exception.ResourceNotFoundException
+      user-service:
+        max-attempts: 3
+        wait-duration: 500ms
+        retry-exceptions:
+          - feign.RetryableException
+        ignore-exceptions:
+          - com.localmart.order_service.exception.ResourceNotFoundException
+
+  # ── Circuit Breaker ───────────────────────────────────────────────────────────
+  # Fires AFTER retry — sees the final outcome of all attempts as one logical call.
+  # sliding-window-size: how many recent final outcomes to track
+  # failure-rate-threshold: % of final failures that trips the circuit to OPEN
+  # minimum-number-of-calls: minimum outcomes before rate is calculated
+  # wait-duration-in-open-state: howal long circuit stays OPEN before probing again (ms)
+  # permitted-number-of-calls-in-half-open-state: test calls lowed during probe
   circuitbreaker:
     instances:
       shop-service:
@@ -51,8 +82,7 @@ resilience4j:
         minimum-number-of-calls: 5
         wait-duration-in-open-state: 10000
         permitted-number-of-calls-in-half-open-state: 3
-        # 4xx errors (shop/product not found) are business errors, not infrastructure failures.
-        # Ignore them so they don't count toward circuit breaker failure rate.
+        # 4xx errors are business errors, not infrastructure failures — don't count them.
         ignore-exceptions:
           - com.localmart.order_service.exception.ResourceNotFoundException
       user-service:
@@ -61,7 +91,6 @@ resilience4j:
         minimum-number-of-calls: 5
         wait-duration-in-open-state: 10000
         permitted-number-of-calls-in-half-open-state: 3
-        # Same reason — 404 user not found is a valid business response, not a service failure.
         ignore-exceptions:
           - com.localmart.order_service.exception.ResourceNotFoundException
 

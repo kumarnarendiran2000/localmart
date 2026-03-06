@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>DEV-REFERENCE</title>
+	<style>
+		/* Basic styles for readability */
+		body {
+			font-family: sans-serif;
+			max-width: 800px;
+			margin: 2em auto;
+			padding: 0 1em;
+			line-height: 1.6;
+		}
+		img { max-width: 100%; height: auto; }
+		pre { background-color: #f4f4f4; padding: 1em; overflow-x: auto; }
+		code { font-family: monospace; }
+	</style>
+</head>
+<body>
+	<h1>LocalMart — Dev Quick Reference</h1>
+<hr>
+<h2>Services</h2>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Port</th>
+<th>Base URL</th>
+<th>Swagger UI</th>
+<th>Health</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>discovery-server</td>
+<td>8761</td>
+<td><a href="http://localhost:8761">http://localhost:8761</a></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>api-gateway</td>
+<td>8080</td>
+<td><a href="http://localhost:8080">http://localhost:8080</a></td>
+<td>—</td>
+<td><a href="http://localhost:8080/actuator/health">http://localhost:8080/actuator/health</a></td>
+</tr>
+<tr>
+<td>shop-service</td>
+<td>8081</td>
+<td><a href="http://localhost:8081">http://localhost:8081</a></td>
+<td><a href="http://localhost:8081/swagger-ui.html">http://localhost:8081/swagger-ui.html</a></td>
+<td><a href="http://localhost:8081/actuator/health">http://localhost:8081/actuator/health</a></td>
+</tr>
+<tr>
+<td>user-service</td>
+<td>8082</td>
+<td><a href="http://localhost:8082">http://localhost:8082</a></td>
+<td><a href="http://localhost:8082/swagger-ui.html">http://localhost:8082/swagger-ui.html</a></td>
+<td><a href="http://localhost:8082/actuator/health">http://localhost:8082/actuator/health</a></td>
+</tr>
+<tr>
+<td>order-service</td>
+<td>8083</td>
+<td><a href="http://localhost:8083">http://localhost:8083</a></td>
+<td><a href="http://localhost:8083/swagger-ui.html">http://localhost:8083/swagger-ui.html</a></td>
+<td><a href="http://localhost:8083/actuator/health">http://localhost:8083/actuator/health</a></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Databases</h2>
+<h3>PostgreSQL</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Host</td>
+<td><code>localhost</code></td>
+</tr>
+<tr>
+<td>Port</td>
+<td><code>5432</code></td>
+</tr>
+<tr>
+<td>Username</td>
+<td><code>localmart</code></td>
+</tr>
+<tr>
+<td>Password</td>
+<td><code>localmart123</code></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Database</th>
+<th>Used by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>localmart_users</code></td>
+<td>user-service</td>
+</tr>
+<tr>
+<td><code>localmart_orders</code></td>
+<td>order-service</td>
+</tr>
+</tbody>
+</table>
+<h3>MongoDB</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Host</td>
+<td><code>localhost</code></td>
+</tr>
+<tr>
+<td>Port</td>
+<td><code>27017</code></td>
+</tr>
+<tr>
+<td>Username</td>
+<td><code>localmart</code></td>
+</tr>
+<tr>
+<td>Password</td>
+<td><code>localmart123</code></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Database / Collection</th>
+<th>Used by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>shop-service</code></td>
+<td>shop-service (created automatically on first run)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Database GUIs</h2>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>URL</th>
+<th>Username</th>
+<th>Password</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pgAdmin 4</td>
+<td><a href="http://localhost:5050">http://localhost:5050</a></td>
+<td><code>admin@localmart.dev</code></td>
+<td><code>admin123</code></td>
+</tr>
+<tr>
+<td>mongo-express</td>
+<td><a href="http://localhost:8091">http://localhost:8091</a></td>
+<td><code>admin</code></td>
+<td><code>pass</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>pgAdmin — register server once:</strong>
+Right-click Servers → Register → Server
+Host: <code>localmart-postgres</code> · Port: <code>5432</code> · Username: <code>localmart</code> · Password: <code>localmart123</code></p>
+</blockquote>
+<hr>
+<h2>Eureka Dashboard</h2>
+<p><a href="http://localhost:8761">http://localhost:8761</a> — shows all registered services and their instance status.</p>
+<hr>
+<h2>Circuit Breaker Actuator (order-service)</h2>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>What it shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="http://localhost:8083/actuator/circuitbreakers">http://localhost:8083/actuator/circuitbreakers</a></td>
+<td>State of all CB instances (CLOSED / OPEN)</td>
+</tr>
+<tr>
+<td><a href="http://localhost:8083/actuator/circuitbreakerevents/user-service">http://localhost:8083/actuator/circuitbreakerevents/user-service</a></td>
+<td>Recent call events for user-service CB</td>
+</tr>
+<tr>
+<td><a href="http://localhost:8083/actuator/circuitbreakerevents/shop-service">http://localhost:8083/actuator/circuitbreakerevents/shop-service</a></td>
+<td>Recent call events for shop-service CB</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Docker</h2>
+<pre><code class="language-bash"># Start all infra containers
+docker compose -f docker-compose.infra.yml up -d
+
+# Start only DB GUI containers (if infra already running)
+docker compose -f docker-compose.infra.yml up -d pgadmin mongo-express
+
+# Stop all
+docker compose -f docker-compose.infra.yml down
+
+# Create PostgreSQL databases (first time only)
+docker exec -it localmart-postgres psql -U localmart -c &quot;CREATE DATABASE localmart_users;&quot;
+docker exec -it localmart-postgres psql -U localmart -c &quot;CREATE DATABASE localmart_orders;&quot;
+</code></pre>
+<hr>
+<h2>Maven</h2>
+<pre><code class="language-bash"># Build all services
+mvn clean install -DskipTests
+
+# Build single service
+mvn clean install -DskipTests -pl order-service -am
+
+# Run a service
+mvn spring-boot:run -pl shop-service
+
+# Start order: discovery-server first, then the rest in any order
+</code></pre>
+
+</body>
+</html>

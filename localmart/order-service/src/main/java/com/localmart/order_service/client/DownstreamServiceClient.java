@@ -4,6 +4,7 @@ import com.localmart.order_service.exception.ResourceNotFoundException;
 import com.localmart.order_service.exception.ServiceUnavailableException;
 import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,7 @@ public class DownstreamServiceClient {
      * 4xx → ResourceNotFoundException (business error, ignored by circuit breaker — see application.yaml)
      * 5xx / connection error → propagates as FeignException → counted as failure → fallback on threshold
      */
+    @Retry(name = "user-service")
     @CircuitBreaker(name = "user-service", fallbackMethod = "userServiceFallback")
     public void verifyUser(UUID userId) {
         try {
@@ -47,6 +49,7 @@ public class DownstreamServiceClient {
      * Fetches product details from shop-service.
      * Same 4xx vs 5xx split as verifyUser.
      */
+    @Retry(name = "shop-service")
     @CircuitBreaker(name = "shop-service", fallbackMethod = "shopServiceFallback")
     public ProductInfo fetchProduct(String shopId, String productId) {
         try {
