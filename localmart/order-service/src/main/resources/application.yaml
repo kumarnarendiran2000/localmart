@@ -25,6 +25,26 @@ spring:
     enabled: true
     locations: classpath:db/migration
 
+  # Kafka — producer and consumer config
+  kafka:
+    bootstrap-servers: localhost:9092  # Kafka broker — host apps use port 9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # JsonSerializer converts our event records to JSON before sending to Kafka
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        # Don't add Spring's __TypeId__ header — payment-service is .NET and won't understand it
+        spring.json.add.type.headers: false
+    consumer:
+      group-id: order-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # StringDeserializer receives raw JSON string — we manually parse it with ObjectMapper
+      # This avoids Spring's type header dependency, making it cross-language compatible
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # earliest: on first start, read from the beginning of the topic
+      # (so no events are missed if consumer was down when the message arrived)
+      auto-offset-reset: earliest
+
   # Feign client timeouts — moved under spring.cloud.openfeign in Spring Cloud 2023+
   # connect-timeout: how long to wait when establishing connection to another service
   # read-timeout: how long to wait for the other service to respond

@@ -58,6 +58,12 @@
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
 
+		<!-- Kafka — async event publishing and consuming -->
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+		</dependency>
+
 		<!-- Resilience4j — circuit breaker -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>

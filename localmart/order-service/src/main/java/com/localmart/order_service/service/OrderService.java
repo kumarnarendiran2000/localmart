@@ -5,10 +5,13 @@ import com.localmart.order_service.client.ProductInfo;
 import com.localmart.order_service.dto.OrderResponse;
 import com.localmart.order_service.dto.PlaceOrderRequest;
 import com.localmart.order_service.dto.UpdateOrderStatusRequest;
+import com.localmart.order_service.event.OrderPlacedEvent;
 import com.localmart.order_service.exception.ResourceNotFoundException;
 import com.localmart.order_service.model.Order;
 import com.localmart.order_service.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,12 +19,14 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
     private final DownstreamServiceClient downstreamServiceClient;
+    private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
     /**
      * Places a new order.
@@ -65,6 +70,27 @@ public class OrderService {
                 .build();
 
         Order saved = orderRepository.save(order);
+
+        // Publish event to Kafka — payment-service consumes this and processes payment.
+        // The orderId is used as the message key so all events for the same order
+        // go to the same Kafka partition (preserves ordering per order).
+        //
+        // Note: kafkaTemplate.send() is async — it queues the message and returns immediately.
+        // If Kafka is down, the order is still saved but payment won't be triggered.
+        // The Outbox Pattern (coming soon) will guarantee reliable delivery.
+        OrderPlacedEvent event = new OrderPlacedEvent(
+                saved.getId(),
+                saved.getUserId(),
+                saved.getShopId(),
+                saved.getProductId(),
+                saved.getProductName(),
+                saved.getUnitPrice(),
+                saved.getQuantity(),
+                saved.getTotalAmount()
+        );
+        kafkaTemplate.send("order.placed", saved.getId().toString(), event);
+        log.debug("Published order.placed event for orderId={}", saved.getId());
+
         return toResponse(saved);
     }
 
