@@ -58,6 +58,28 @@
 
 ---
 
+## Kafka
+
+| Item            | Value                                          |
+| --------------- | ---------------------------------------------- |
+| Broker (host)   | `localhost:9092`                               |
+| Broker (Docker) | `localmart-kafka:29092`                        |
+| Kafka UI        | [http://localhost:8090](http://localhost:8090) |
+
+**Topics:**
+
+| Topic               | Published by    | Consumed by      |
+| ------------------- | --------------- | ---------------- |
+| `order.placed`      | order-service   | payment-service  |
+| `payment.processed` | payment-service | order-service    |
+
+> **Why two ports?**
+> Host apps (Java services running locally) use `localhost:9092`.
+> Docker containers talking to each other use `localmart-kafka:29092`.
+> `localhost` inside a container refers to the container itself, not the Kafka container.
+
+---
+
 ## Eureka Dashboard
 
 http://localhost:8761 — shows all registered services and their instance status.

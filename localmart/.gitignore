@@ -1,0 +1,30 @@
+# ── Java / Maven ──────────────────────────────────────────────────────────────
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+HELP.md
+
+# ── .NET ──────────────────────────────────────────────────────────────────────
+# Compiled output and intermediate build files — never commit these
+**/bin/
+**/obj/
+
+# Published output
+**/publish/
+
+# User-specific files
+*.user
+*.suo
+
+# ── IDE — IntelliJ / VS Code ─────────────────────────────────────────────────
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.vs/
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db

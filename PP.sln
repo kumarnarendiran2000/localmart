@@ -1,0 +1,29 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "localmart", "localmart", "{A7863BBE-876A-026A-EE2A-7F630124779E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "payment-service", "localmart\payment-service\payment-service.csproj", "{2C200433-2C04-A989-90EE-48A4776091C7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2C200433-2C04-A989-90EE-48A4776091C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C200433-2C04-A989-90EE-48A4776091C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C200433-2C04-A989-90EE-48A4776091C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C200433-2C04-A989-90EE-48A4776091C7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2C200433-2C04-A989-90EE-48A4776091C7} = {A7863BBE-876A-026A-EE2A-7F630124779E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {678987D0-3736-40BF-B536-B2224B0C6E28}
+	EndGlobalSection
+EndGlobal
